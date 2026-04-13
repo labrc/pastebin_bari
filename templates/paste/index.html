@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Paste - bari.ar{% endblock %}
+
+{% block content %}
+<div class="grid md:grid-cols-3 gap-8">
+    <!-- Formulario -->
+    <div class="md:col-span-2">
+        <div class="bg-slate-800 rounded-lg border border-slate-700 p-6">
+            <h1
+                class="text-3xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+                Nueva Nota
+            </h1>
+
+            <form id="pasteForm" class="space-y-4">
+                <div>
+                    <label for="content" class="block text-sm font-medium text-slate-300 mb-2">
+                        Pegá tu contenido aquí:
+                    </label>
+                    <textarea id="content" name="content" rows="20"
+                        class="w-full px-4 py-3 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent resize-none font-mono text-sm"
+                        placeholder="Pegá tu texto, código, o lo que necesites guardar..."></textarea>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="submit"
+                        class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-lg font-semibold transition transform hover:scale-105">
+                        Guardar Nota
+                    </button>
+                    <button type="button" onclick="document.getElementById('content').value = '';"
+                        class="px-6 py-3 bg-slate-700 hover:bg-slate-600 rounded-lg font-semibold transition">
+                        Limpiar
+                    </button>
+                </div>
+            </form>
+
+            <!-- Mensaje de estado -->
+            <div id="statusMessage" class="mt-4 p-4 rounded-lg hidden" role="alert">
+                <p id="statusText"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel lateral -->
+    <div class="md:col-span-1">
+        <div class="bg-slate-800 rounded-lg border border-slate-700 p-6 sticky top-24">
+            <h2 class="text-xl font-bold mb-4 text-cyan-400">Información</h2>
+
+            <div class="space-y-4 text-sm text-slate-300">
+                <div>
+                    <h3 class="font-semibold text-white mb-2">¿Cómo funciona?</h3>
+                    <ol class="list-decimal list-inside space-y-1">
+                        <li>Pegá tu contenido</li>
+                        <li>Click en "Guardar Nota"</li>
+                        <li>¡Listo! Tu nota se guarda con fecha</li>
+                    </ol>
+                </div>
+
+                <div class="border-t border-slate-700 pt-4">
+                    <h3 class="font-semibold text-white mb-2">Opciones</h3>
+                    <ul class="space-y-1">
+                        <li>✓ Guardado automático de fecha</li>
+                        <li>✓ Acceso rápido a notas</li>
+                        <li>✓ Sin límite de caracteres</li>
+                        <li>✓ HTTPS seguro</li>
+                    </ul>
+                </div>
+
+                <div class="border-t border-slate-700 pt-4">
+                    <a href="{% url 'notas_list' %}"
+                        class="block w-full text-center px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition font-semibold">
+                        Ver todas las notas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('pasteForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const content = document.getElementById('content').value.trim();
+        const statusDiv = document.getElementById('statusMessage');
+        const statusText = document.getElementById('statusText');
+
+        if (!content) {
+            statusDiv.className = 'mt-4 p-4 rounded-lg bg-red-900 border border-red-700 text-red-200';
+            statusText.textContent = '❌ El contenido no puede estar vacío';
+            return;
+        }
+
+        try {
+            statusDiv.className = 'mt-4 p-4 rounded-lg bg-blue-900 border border-blue-700 text-blue-200';
+            statusText.textContent = '⏳ Guardando...';
+            statusDiv.classList.remove('hidden');
+
+            const response = await fetch('{% url "create_paste" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                statusDiv.className = 'mt-4 p-4 rounded-lg bg-green-900 border border-green-700 text-green-200';
+                statusText.textContent = `✅ ${data.message}`;
+                document.getElementById('content').value = '';
+
+                // Redirigir después de 2 segundos
+                setTimeout(() => {
+                    window.location.href = '{% url "notas_list" %}';
+                }, 2000);
+            } else {
+                statusDiv.className = 'mt-4 p-4 rounded-lg bg-red-900 border border-red-700 text-red-200';
+                statusText.textContent = `❌ ${data.error}`;
+            }
+        } catch (error) {
+            statusDiv.className = 'mt-4 p-4 rounded-lg bg-red-900 border border-red-700 text-red-200';
+            statusText.textContent = `❌ Error: ${error.message}`;
+        }
+    });
+</script>
+{% endblock %}
