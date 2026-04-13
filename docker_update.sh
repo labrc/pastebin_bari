@@ -19,6 +19,9 @@ git pull origin main 2>&1 || {
     exit 1
 }
 
+# Re-aplicar permisos al script (git pull puede resetearlos)
+chmod +x /app/docker_update.sh 2>/dev/null || true
+
 # 2. Verificar si hubo actualizaciones
 CURRENT_HASH=$(git rev-parse HEAD)
 PREV_HASH_FILE="/tmp/.last_commit_hash"

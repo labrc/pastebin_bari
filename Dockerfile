@@ -22,7 +22,7 @@ COPY docker_update.sh /app/docker_update.sh
 RUN chmod +x /app/docker_update.sh
 
 # Setup cron to run update script daily at midnight
-RUN echo "0 0 * * * /app/docker_update.sh >> /var/log/pastebin_update.log 2>&1" > /etc/cron.d/pastebin-update \
+RUN echo "0 0 * * * bash /app/docker_update.sh >> /var/log/pastebin_update.log 2>&1" > /etc/cron.d/pastebin-update \
     && chmod 0644 /etc/cron.d/pastebin-update \
     && crontab /etc/cron.d/pastebin-update
 
