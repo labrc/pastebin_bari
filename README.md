@@ -23,13 +23,13 @@ Un pastebin rápido y minimalista construido con Django, con diseño moderno en 
 ### 1️⃣ Crear estructura de directorios
 
 ```bash
-sudo mkdir -p /home/fcs2/Servidor/Pastebin
-cd /home/fcs2/Servidor/Pastebin
+sudo mkdir -p /home/$user/Servidor/Pastebin
+cd /home/$user/Servidor/Pastebin
 ```
 
 ### 2️⃣ Copiar archivos
 
-Copia todos los archivos generados a `/home/fcs2/Servidor/Pastebin/`:
+Copia todos los archivos generados a `/home/$user/Servidor/Pastebin/`:
 
 ```
 Pastebin/
@@ -58,20 +58,20 @@ Pastebin/
 ### 3️⃣ Configurar permisos
 
 ```bash
-sudo chown -R fcs2:fcs2 /home/fcs2/Servidor/Pastebin
-cd /home/fcs2/Servidor/Pastebin
+sudo chown -R $user:$user /home/$user/Servidor/Pastebin
+cd /home/$user/Servidor/Pastebin
 chmod +x manage.py
 ```
 
 ### 4️⃣ Copiar configuración nginx
 
 ```bash
-cp pastebin_nginx.conf /home/fcs2/Servidor/conf.d/
+cp pastebin_nginx.conf /home/$user/Servidor/conf.d/
 ```
 
 ### 5️⃣ Agregar a docker-compose.yml
 
-Abre tu `/home/fcs2/Wanderer/Web2/docker-compose.yml` y **ANTES** de la última sección `networks:`, 
+Abre tu `/home/$user/Wanderer/Web2/docker-compose.yml` y **ANTES** de la última sección `networks:`, 
 agrega el fragmento que está en `docker-compose-fragment.yml`.
 
 Debería verse así:
@@ -130,7 +130,6 @@ networks:
 ### 6️⃣ Iniciar los contenedores
 
 ```bash
-cd /home/fcs2/Wanderer/Web2/
 docker-compose up -d
 ```
 
@@ -143,22 +142,18 @@ docker-compose logs -f nginx_pastebin
 
 ### 7️⃣ Acceder a la aplicación
 
-```
-https://paste.bari.ar
-```
-
 ## 📖 Uso
 
 ### Crear una nota
 
-1. Accedé a `https://paste.bari.ar`
+1. Accedé a la web
 2. Pegá tu contenido en el textarea
 3. Click en "Guardar Nota"
 4. ¡Automáticamente se guarda con fecha y hora!
 
 ### Ver todas las notas
 
-Accedé a `https://paste.bari.ar/notas/` para ver un listado de todas las notas guardadas.
+Accedé a `/notas/` para ver un listado de todas las notas guardadas.
 
 Características del listado:
 - 📅 Fecha y hora de creación
@@ -202,7 +197,7 @@ La aplicación usa SQLite por defecto, que se guarda en:
 
 Para hacer un backup:
 ```bash
-cp /home/fcs2/Servidor/Pastebin/db.sqlite3 /home/fcs2/Servidor/Pastebin/db.sqlite3.backup
+cp /home/$user/Servidor/Pastebin/db.sqlite3 /home/$user/Servidor/Pastebin/db.sqlite3.backup
 ```
 
 ## 📊 Monitoreo
@@ -244,7 +239,7 @@ server django_pastebin:8007;
 
 ```bash
 docker-compose down
-rm /home/fcs2/Servidor/Pastebin/db.sqlite3
+rm /home/$user/Servidor/Pastebin/db.sqlite3
 docker-compose up -d
 ```
 
