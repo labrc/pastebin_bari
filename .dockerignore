@@ -1,0 +1,7 @@
+.git/
+db.sqlite3
+__pycache__/
+*.py[cod]
+staticfiles/
+media/
+*.log
