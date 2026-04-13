@@ -37,3 +37,7 @@ Thumbs.db
 
 # Docker
 *.pid
+
+# Auto-update
+auto_update.log
+/tmp/.last_commit_hash
