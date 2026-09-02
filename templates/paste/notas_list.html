@@ -23,7 +23,7 @@
 {% if page_obj %}
 <div class="space-y-6">
     {% for paste in page_obj %}
-    <div class="bento-card group cursor-pointer transition-all" onclick="togglePaste({{ paste.id }})">
+    <div class="bento-card group cursor-pointer transition-all" onclick="togglePaste(event, {{ paste.id }})">
         <div class="bento-glow bg-gradient-to-br from-cyan-500/10 to-transparent"></div>
         <div class="content-z p-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -104,21 +104,40 @@
 {% endif %}
 
 <script>
-    function togglePaste(pasteId) {
+    function togglePaste(event, pasteId) {
         const contentDiv = document.getElementById(`content-${pasteId}`);
+        // No colapsar si el clic provino del contenido expandido
+        // (p.ej., cuando el usuario esta seleccionando texto)
+        if (contentDiv && event.target.closest(`#content-${pasteId}`)) {
+            return;
+        }
         contentDiv.classList.toggle('hidden');
     }
 
     async function copyPaste(event, pasteId) {
         event.stopPropagation();
+        // Obtener el boton antes del primer `await`: despues de ese,
+        // event.currentTarget ya es null y el boton "no existe"
+        const button = event.currentTarget;
 
         try {
             const response = await fetch(`/api/paste/${pasteId}/`);
             const data = await response.json();
 
-            await navigator.clipboard.writeText(data.content);
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(data.content);
+            } else {
+                // Fallback para contextos sin API de portapapeles
+                const helper = document.createElement('textarea');
+                helper.value = data.content;
+                helper.style.position = 'fixed';
+                helper.style.left = '-9999px';
+                document.body.appendChild(helper);
+                helper.select();
+                document.execCommand('copy');
+                document.body.removeChild(helper);
+            }
 
-            const button = event.currentTarget;
             const originalHTML = button.innerHTML;
             button.innerHTML = '<i class="fa-solid fa-check"></i> Copiado';
             button.classList.add('bg-emerald-500/20', 'text-emerald-400', 'border-emerald-500/50');
