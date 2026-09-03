@@ -129,6 +129,16 @@ networks:
 
 ### 6️⃣ Iniciar los contenedores
 
+Para forzar una actualización del código cuando el contenedor usa un volumen
+Docker en `/app`, ejecuta desde este directorio:
+
+```bash
+./force_update.sh
+```
+
+El script excluye `db.sqlite3`, `media/`, `staticfiles/` y los logs para
+preservar los datos persistentes.
+
 ```bash
 docker-compose up -d
 ```
